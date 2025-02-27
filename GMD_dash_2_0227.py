@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
-st.sidebar.image("C:/Users/Elvischen/OneDrive - 國立臺中科技大學/桌面/GMD/GMD.png")
+st.sidebar.image("GMD.png")
 
 # Function to plot charts based on the selected chart type
 def plot_chart(data, y_column, title, chart_type):
