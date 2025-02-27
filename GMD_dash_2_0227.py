@@ -279,25 +279,33 @@ def full_product_page(df):
         # Section 3: Top10 庫存
         st.subheader("Top10 庫存")
 
-        if start_date and end_date:
-            filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
+        # Get the latest available date in the dataset
+        latest_date = df["交貨日"].max()
+
+        if pd.notna(latest_date):  # Ensure latest_date is valid
+            # Filter the dataframe for only the latest date
+            latest_df = df[df["交貨日"] == latest_date]
+
+            # Keep only the latest day's A1庫存 for each 項目名稱
+            inventory_df = latest_df.sort_values(by="交貨日", ascending=False).drop_duplicates(subset=["項目名稱"],
+                                                                                               keep="first")
+
+            # Sort and get the Top 10 based on A1庫存
+            inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
+
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.subheader(f" ({latest_date.strftime('%Y-%m-%d')})")
+                st.dataframe(inventory_df[["項目名稱", "A1庫存"]], hide_index=True)
+
+            with col2:
+                if not inventory_df.empty:
+                    fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
+                    st.plotly_chart(fig)
+                else:
+                    st.warning("沒有符合條件的資料")
         else:
-            filtered_df = df.copy()
-
-        inventory_df = filtered_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
-        inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
-
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.subheader(f" ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
-            st.dataframe(inventory_df, hide_index=True)
-        with col2:
-            if not inventory_df.empty:
-                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
-                st.plotly_chart(fig)
-            else:
-                st.warning("沒有符合條件的資料")
-
+            st.warning("無法獲取最新日期的資料")
 
 # Upload the data
 st.sidebar.header("Upload Your Data")
