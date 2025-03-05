@@ -174,7 +174,7 @@ def full_product_page(df):
     else:
         start_date, end_date = min_date, max_date
 
-  if section_selection == "庫存":
+      if section_selection == "庫存":
         # Section 1: 庫存
         st.subheader("庫存")
         # Sort customers alphabetically and then let user select
