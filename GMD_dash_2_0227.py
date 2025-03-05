@@ -217,7 +217,8 @@ def full_product_page(df):
     elif section_selection == "生產淡旺季":
         # Section 2: 生產淡旺季
         st.subheader("生產淡旺季")
-        selected_customer = st.sidebar.selectbox("選擇客戶", df["客戶"].unique())
+        sorted_customers = sorted(df["客戶"].unique())
+        selected_customer = st.sidebar.selectbox("選擇客戶", sorted_customers)
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
