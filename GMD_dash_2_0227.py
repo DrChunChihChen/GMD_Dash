@@ -174,34 +174,46 @@ def full_product_page(df):
     else:
         start_date, end_date = min_date, max_date
 
-    if section_selection == "庫存":
+  if section_selection == "庫存":
         # Section 1: 庫存
         st.subheader("庫存")
-        selected_customer = st.sidebar.selectbox("選擇客戶", df["客戶"].unique())
+        # Sort customers alphabetically and then let user select
+        sorted_customers = sorted(df["客戶"].unique())
+        selected_customer = st.sidebar.selectbox("選擇客戶", sorted_customers)
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
             filtered_df = filtered_df[(filtered_df["交貨日"] >= start_date) & (filtered_df["交貨日"] <= end_date)]
 
-        inventory_df = filtered_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
-        inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False)
-        inventory_df = inventory_df[inventory_df["A1庫存"] > 0]
+        if not filtered_df.empty:
+            last_date = filtered_df["交貨日"].max()
+        # Filter to only include rows with the last delivery date
+            last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
+        
+        # Group by item name and get the inventory for the last date
+            inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
+            inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False)
+            inventory_df = inventory_df[inventory_df["A1庫存"] > 0]
+        
         # Calculate Percentage
-        inventory_df["percentage"] = (inventory_df["A1庫存"] / inventory_df["A1庫存"].sum()) * 100
-
-        # Filter out percentages lower than 1%
-        inventory_df = inventory_df[inventory_df["percentage"] >= 1]
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.subheader(f"A1庫存明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
-            st.dataframe(inventory_df.drop(columns=["percentage"]))
-        with col2:
-            if not inventory_df.empty:
-                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="A1庫存分佈")
-                st.plotly_chart(fig)
-
-            else:
-                st.warning("沒有符合條件的資料")
+            if inventory_df["A1庫存"].sum() > 0:
+                inventory_df["percentage"] = (inventory_df["A1庫存"] / inventory_df["A1庫存"].sum()) * 100
+            # Filter out percentages lower than 1%
+                inventory_df = inventory_df[inventory_df["percentage"] >= 1]
+        
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(last_date)
+                st.subheader(f"A1庫存明細 (最後交貨日: {last_date_str})")
+                st.dataframe(inventory_df.drop(columns=["percentage"]) if "percentage" in inventory_df.columns else inventory_df)
+            with col2:
+                if not inventory_df.empty:
+                    fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="A1庫存分佈")
+                    st.plotly_chart(fig)
+                else:
+                    st.warning("沒有符合條件的資料")
+        else:
+            st.warning("沒有符合條件的資料")
 
     elif section_selection == "生產淡旺季":
         # Section 2: 生產淡旺季
