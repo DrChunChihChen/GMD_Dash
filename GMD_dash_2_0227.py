@@ -297,19 +297,29 @@ def full_product_page(df):
         else:
             filtered_df = df.copy()
 
-        inventory_df = filtered_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
+    # Get the last delivery date in the filtered data
+    if not filtered_df.empty:
+        last_date = filtered_df["交貨日"].max()
+        # Filter to only include rows with the last delivery date
+        last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
+        
+        # Group by item name and get the inventory for the last date
+        inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
         inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
-
+        
         col1, col2 = st.columns([1, 1])
         with col1:
-            st.subheader(f" ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
+            last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(last_date)
+            st.subheader(f"Top10 庫存 (最後交貨日: {last_date_str})")
             st.dataframe(inventory_df, hide_index=True)
         with col2:
             if not inventory_df.empty:
-                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
+                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="Top10 庫存分佈")
                 st.plotly_chart(fig)
             else:
                 st.warning("沒有符合條件的資料")
+    else:
+        st.warning("沒有符合條件的資料")
 
 
 # Upload the data
