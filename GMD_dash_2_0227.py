@@ -38,7 +38,8 @@ def product_page(df):
     if date_range:
         start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
         filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
-    filtered_df = filtered_df[filtered_df["項目名稱"].str.startswith(item_name)]
+    filtered_df = filtered_df[filtered_df["項目名稱"].notna() & filtered_df["項目名稱"].str.startswith(item_name)]
+
 
     # Group by Year and Month for each metric
     filtered_df['Year'] = filtered_df['客戶需求日期'].dt.year
