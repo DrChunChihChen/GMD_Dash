@@ -157,7 +157,7 @@ def full_product_page(df):
     st.header("庫存&淡旺季")
 
     # Sidebar section selection
-    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季", "Top 10 生產淡旺季", "Top10 庫存"])
+    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季",  "Top10 庫存"])
 
     # Get initial date range from data
     if not df.empty:
@@ -259,33 +259,33 @@ def full_product_page(df):
         else:
             st.warning("沒有符合條件的資料")
 
-    if section_selection == "Top 10 生產淡旺季":
-        # Section 3: 生產淡旺季Top 10
-        st.subheader("生產淡旺季Top 10")
+    # if section_selection == "Top 10 生產淡旺季":
+    #     # Section 3: 生產淡旺季Top 10
+    #     st.subheader("生產淡旺季Top 10")
 
-        if start_date and end_date:
-            filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
-        else:
-            filtered_df = df.copy()
+    #     if start_date and end_date:
+    #         filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
+    #     else:
+    #         filtered_df = df.copy()
 
-        filtered_df["Year"] = filtered_df["交貨日"].dt.year
-        filtered_df["Month"] = filtered_df["交貨日"].dt.strftime("%m")  # Extract month as string
-        filtered_df["Month"] = filtered_df["Month"].astype(int)  # Convert to integer for sorting
+    #     filtered_df["Year"] = filtered_df["交貨日"].dt.year
+    #     filtered_df["Month"] = filtered_df["交貨日"].dt.strftime("%m")  # Extract month as string
+    #     filtered_df["Month"] = filtered_df["Month"].astype(int)  # Convert to integer for sorting
 
-        seasonality_top10_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
-        seasonality_top10_df = seasonality_top10_df.sort_values(by=["Month"])
+    #     seasonality_top10_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
+    #     seasonality_top10_df = seasonality_top10_df.sort_values(by=["Month"])
 
-        st.subheader(f"生產淡旺季Top 10 明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
-        st.dataframe(seasonality_top10_df, hide_index=True)
+    #     st.subheader(f"生產淡旺季Top 10 明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
+    #     st.dataframe(seasonality_top10_df, hide_index=True)
 
-        if not seasonality_top10_df.empty:
-            fig = px.line(seasonality_top10_df, x="Month", y="原始訂單數", color="Year",
-                          title="生產淡旺季Top 10 趨勢圖", markers=True, line_shape='linear')
-            fig.update_xaxes(type='category', tickmode='array', tickvals=list(range(1, 13)),
-                             ticktext=[f"{i}月" for i in range(1, 13)])
-            st.plotly_chart(fig)
-        else:
-            st.warning("沒有符合條件的資料")
+    #     if not seasonality_top10_df.empty:
+    #         fig = px.line(seasonality_top10_df, x="Month", y="原始訂單數", color="Year",
+    #                       title="生產淡旺季Top 10 趨勢圖", markers=True, line_shape='linear')
+    #         fig.update_xaxes(type='category', tickmode='array', tickvals=list(range(1, 13)),
+    #                          ticktext=[f"{i}月" for i in range(1, 13)])
+    #         st.plotly_chart(fig)
+    #     else:
+    #         st.warning("沒有符合條件的資料")
 
     elif section_selection == "Top10 庫存":
         # Section 3: Top10 庫存
