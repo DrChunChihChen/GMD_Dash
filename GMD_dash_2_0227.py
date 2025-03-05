@@ -40,7 +40,6 @@ def product_page(df):
         filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
     filtered_df = filtered_df[filtered_df["項目名稱"].notna() & filtered_df["項目名稱"].str.startswith(item_name)]
 
-
     # Group by Year and Month for each metric
     filtered_df['Year'] = filtered_df['客戶需求日期'].dt.year
     filtered_df['Month'] = filtered_df['客戶需求日期'].dt.month
@@ -158,7 +157,7 @@ def full_product_page(df):
     st.header("庫存&淡旺季")
 
     # Sidebar section selection
-    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季", "Top10 庫存"])
+    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季", "Top 10 生產淡旺季", "Top10 庫存"])
 
     # Get initial date range from data
     if not df.empty:
@@ -174,7 +173,7 @@ def full_product_page(df):
     else:
         start_date, end_date = min_date, max_date
 
-      if section_selection == "庫存":
+    if section_selection == "庫存":
         # Section 1: 庫存
         st.subheader("庫存")
         # Sort customers alphabetically and then let user select
@@ -260,65 +259,57 @@ def full_product_page(df):
         else:
             st.warning("沒有符合條件的資料")
 
-    # if section_selection == "Top 10 生產淡旺季":
-    #     # Section 3: 生產淡旺季Top 10
-    #     st.subheader("生產淡旺季Top 10")
+    if section_selection == "Top 10 生產淡旺季":
+        # Section 3: 生產淡旺季Top 10
+        st.subheader("生產淡旺季Top 10")
 
-    #     if start_date and end_date:
-    #         filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
-    #     else:
-    #         filtered_df = df.copy()
+        if start_date and end_date:
+            filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
+        else:
+            filtered_df = df.copy()
 
-    #     filtered_df["Year"] = filtered_df["交貨日"].dt.year
-    #     filtered_df["Month"] = filtered_df["交貨日"].dt.strftime("%m")  # Extract month as string
-    #     filtered_df["Month"] = filtered_df["Month"].astype(int)  # Convert to integer for sorting
+        filtered_df["Year"] = filtered_df["交貨日"].dt.year
+        filtered_df["Month"] = filtered_df["交貨日"].dt.strftime("%m")  # Extract month as string
+        filtered_df["Month"] = filtered_df["Month"].astype(int)  # Convert to integer for sorting
 
-    #     seasonality_top10_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
-    #     seasonality_top10_df = seasonality_top10_df.sort_values(by=["Month"])
+        seasonality_top10_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
+        seasonality_top10_df = seasonality_top10_df.sort_values(by=["Month"])
 
-    #     st.subheader(f"生產淡旺季Top 10 明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
-    #     st.dataframe(seasonality_top10_df, hide_index=True)
+        st.subheader(f"生產淡旺季Top 10 明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
+        st.dataframe(seasonality_top10_df, hide_index=True)
 
-    #     if not seasonality_top10_df.empty:
-    #         fig = px.line(seasonality_top10_df, x="Month", y="原始訂單數", color="Year",
-    #                       title="生產淡旺季Top 10 趨勢圖", markers=True, line_shape='linear')
-    #         fig.update_xaxes(type='category', tickmode='array', tickvals=list(range(1, 13)),
-    #                          ticktext=[f"{i}月" for i in range(1, 13)])
-    #         st.plotly_chart(fig)
-    #     else:
-    #         st.warning("沒有符合條件的資料")
+        if not seasonality_top10_df.empty:
+            fig = px.line(seasonality_top10_df, x="Month", y="原始訂單數", color="Year",
+                          title="生產淡旺季Top 10 趨勢圖", markers=True, line_shape='linear')
+            fig.update_xaxes(type='category', tickmode='array', tickvals=list(range(1, 13)),
+                             ticktext=[f"{i}月" for i in range(1, 13)])
+            st.plotly_chart(fig)
+        else:
+            st.warning("沒有符合條件的資料")
 
     elif section_selection == "Top10 庫存":
         # Section 3: Top10 庫存
         st.subheader("Top10 庫存")
 
-        # Get the latest available date in the dataset
-        latest_date = df["交貨日"].max()
-
-        if pd.notna(latest_date):  # Ensure latest_date is valid
-            # Filter the dataframe for only the latest date
-            latest_df = df[df["交貨日"] == latest_date]
-
-            # Keep only the latest day's A1庫存 for each 項目名稱
-            inventory_df = latest_df.sort_values(by="交貨日", ascending=False).drop_duplicates(subset=["項目名稱"],
-                                                                                               keep="first")
-
-            # Sort and get the Top 10 based on A1庫存
-            inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
-
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.subheader(f" ({latest_date.strftime('%Y-%m-%d')})")
-                st.dataframe(inventory_df[["項目名稱", "A1庫存"]], hide_index=True)
-
-            with col2:
-                if not inventory_df.empty:
-                    fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
-                    st.plotly_chart(fig)
-                else:
-                    st.warning("沒有符合條件的資料")
+        if start_date and end_date:
+            filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
         else:
-            st.warning("無法獲取最新日期的資料")
+            filtered_df = df.copy()
+
+        inventory_df = filtered_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
+        inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
+
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.subheader(f" ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
+            st.dataframe(inventory_df, hide_index=True)
+        with col2:
+            if not inventory_df.empty:
+                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
+                st.plotly_chart(fig)
+            else:
+                st.warning("沒有符合條件的資料")
+
 
 # Upload the data
 st.sidebar.header("Upload Your Data")
@@ -346,3 +337,4 @@ if uploaded_file is not None:
         st.error(f"An error occurred: {e}")
 else:
     st.write("Please upload an Excel file to begin.")
+
