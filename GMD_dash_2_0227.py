@@ -182,12 +182,12 @@ def full_product_page(df):
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
-            filtered_df = filtered_df[(filtered_df["交貨日"] >= start_date) & (filtered_df["交貨日"] <= end_date)]
+            filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
 
         if not filtered_df.empty:
-            last_date = filtered_df["交貨日"].max()
+            last_date = filtered_df["客戶需求日期"].max()
         # Filter to only include rows with the last delivery date
-            last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
+            last_date_df = filtered_df[filtered_df["客戶需求日期"] == last_date]
         
         # Group by item name and get the inventory for the last date
             inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
@@ -222,12 +222,12 @@ def full_product_page(df):
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
-            filtered_df = filtered_df[(filtered_df["交貨日"] >= start_date) & (filtered_df["交貨日"] <= end_date)]
+            filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
         else:
             filtered_df = df.copy()
 
-        filtered_df["Year"] = filtered_df["交貨日"].dt.year
-        filtered_df["Month"] = filtered_df["交貨日"].dt.month.astype(int)  # Extract month and convert to integer
+        filtered_df["Year"] = filtered_df["客戶需求日期"].dt.year
+        filtered_df["Month"] = filtered_df["客戶需求日期"].dt.month.astype(int)  # Extract month and convert to integer
 
         # Aggregate by Year and Month
         seasonality_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
@@ -293,13 +293,13 @@ def full_product_page(df):
         st.subheader("Top10 庫存")
 
         if start_date and end_date:
-            filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
+            filtered_df = df[(df["客戶需求日期"] >= start_date) & (df["客戶需求日期"] <= end_date)]
         else:
             filtered_df = df.copy()
 
     # Get the last delivery date in the filtered data
     if not filtered_df.empty:
-        last_date = filtered_df["交貨日"].max()
+        last_date = filtered_df["客戶需求日期"].max()
         # Filter to only include rows with the last delivery date
         last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
         
