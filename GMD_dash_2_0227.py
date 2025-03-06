@@ -29,10 +29,6 @@ def product_page(df):
     date_range = st.sidebar.date_input("Select 客戶需求日期", [])
 
     # Select 項目名稱
-    # Ensure all values are strings before extracting prefixes
-    date_range = st.sidebar.date_input("Select 客戶需求日期", [])
-
-    # Select 項目名稱
     item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", df["項目名稱"].str[:3].unique())
     
 
