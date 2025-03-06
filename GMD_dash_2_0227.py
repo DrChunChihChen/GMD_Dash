@@ -205,7 +205,7 @@ def full_product_page(df):
             last_date_df = filtered_df[filtered_df["客戶需求日期"] == last_date]
 
             # Group by item name and get the inventory for the last date
-            inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
+            inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].first()
             inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False)
             inventory_df = inventory_df[inventory_df["A1庫存"] > 0]
 
