@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-
 st.sidebar.image("GMD.png")
 
 # Function to plot charts based on the selected chart type
@@ -16,10 +15,12 @@ def plot_chart(data, y_column, title, chart_type):
             fig.add_trace(go.Bar(x=year_df['Month'], y=year_df[y_column], name=f'Bar - {y_column} ({year})'))
 
         if chart_type in ["Line", "Both"]:
-            fig.add_trace(go.Scatter(x=year_df['Month'], y=year_df[y_column], mode='lines+markers', name=f'Line - {y_column} ({year})'))
+            fig.add_trace(go.Scatter(x=year_df['Month'], y=year_df[y_column], mode='lines+markers',
+                                     name=f'Line - {y_column} ({year})'))
 
     fig.update_layout(title=title, xaxis_title='Month', yaxis_title=y_column)
     return fig
+
 
 def product_page(df):
     st.header("產品 Page")
@@ -37,7 +38,8 @@ def product_page(df):
     filtered_df = df.copy()
     if date_range:
         start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
-        filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
+        filtered_df = filtered_df[
+            (filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
     filtered_df = filtered_df[filtered_df["項目名稱"].notna() & filtered_df["項目名稱"].str.startswith(item_name)]
 
     # Group by Year and Month for each metric
@@ -51,7 +53,7 @@ def product_page(df):
     }).reset_index()
 
     # Calculate 最終交貨率
-    grouped_df['最終交貨率 %'] = (grouped_df['已交數'] / grouped_df['原始訂單數'])*100
+    grouped_df['最終交貨率 %'] = (grouped_df['已交數'] / grouped_df['原始訂單數']) * 100
 
     # Display the combined data in a table with the selected 項目名稱 in the title
     st.subheader(f"[{item_name}] 原始資料")
@@ -73,6 +75,7 @@ def product_page(df):
 
     with tab3:
         st.plotly_chart(plot_chart(grouped_df, '最終交貨率 %', f"[{item_name}] 最終交貨率趨勢圖 %", chart_type))
+
 
 def dealer_page(df):
     st.header("經銷商 Page")
@@ -112,7 +115,7 @@ def dealer_page(df):
     if date_range and len(date_range) == 2:  # Ensure two dates are selected
         start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
         filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) &
-                                 (filtered_df["客戶需求日期"] <= end_date)]
+                                  (filtered_df["客戶需求日期"] <= end_date)]
     filtered_df = filtered_df[filtered_df["客戶名稱"] == final_customer_name]
 
     # Group by Year and Month for each metric
@@ -126,7 +129,7 @@ def dealer_page(df):
     }).reset_index()
 
     # Calculate 最終交貨率
-    grouped_df['最終交貨率 %'] = (grouped_df['已交數'] / grouped_df['原始訂單數'])*100
+    grouped_df['最終交貨率 %'] = (grouped_df['已交數'] / grouped_df['原始訂單數']) * 100
 
     # Display the combined data in a table with the selected 客戶名稱 in the title
     st.subheader(f"[{final_customer_name}] 原始資料")
@@ -142,22 +145,22 @@ def dealer_page(df):
     # Plot the charts in the respective tabs
     with tab1:
         st.plotly_chart(plot_chart(grouped_df, '原始訂單數',
-                                  f"[{final_customer_name}] 原始訂單數趨勢圖", chart_type))
+                                   f"[{final_customer_name}] 原始訂單數趨勢圖", chart_type))
 
     with tab2:
         st.plotly_chart(plot_chart(grouped_df, '已交數',
-                                  f"[{final_customer_name}] 已交數趨勢圖", chart_type))
+                                   f"[{final_customer_name}] 已交數趨勢圖", chart_type))
 
     with tab3:
         st.plotly_chart(plot_chart(grouped_df, '最終交貨率 %',
-                                  f"[{final_customer_name}] 最終交貨率趨勢圖 %", chart_type))
+                                   f"[{final_customer_name}] 最終交貨率趨勢圖 %", chart_type))
 
 
 def full_product_page(df):
     st.header("庫存&淡旺季")
 
     # Sidebar section selection
-    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季",  "Top10 庫存"])
+    section_selection = st.sidebar.radio("選擇區塊", ["庫存", "生產淡旺季", "Top10 庫存"])
 
     # Get initial date range from data
     if not df.empty:
@@ -182,29 +185,32 @@ def full_product_page(df):
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
-            filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
+            filtered_df = filtered_df[
+                (filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
 
         if not filtered_df.empty:
             last_date = filtered_df["客戶需求日期"].max()
-        # Filter to only include rows with the last delivery date
+            # Filter to only include rows with the last delivery date
             last_date_df = filtered_df[filtered_df["客戶需求日期"] == last_date]
-        
-        # Group by item name and get the inventory for the last date
+
+            # Group by item name and get the inventory for the last date
             inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
             inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False)
             inventory_df = inventory_df[inventory_df["A1庫存"] > 0]
-        
-        # Calculate Percentage
+
+            # Calculate Percentage
             if inventory_df["A1庫存"].sum() > 0:
                 inventory_df["percentage"] = (inventory_df["A1庫存"] / inventory_df["A1庫存"].sum()) * 100
-            # Filter out percentages lower than 1%
+                # Filter out percentages lower than 1%
                 inventory_df = inventory_df[inventory_df["percentage"] >= 1]
-        
+
             col1, col2 = st.columns([1, 1])
             with col1:
-                last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(last_date)
+                last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(
+                    last_date)
                 st.subheader(f"A1庫存明細 (最後交貨日: {last_date_str})")
-                st.dataframe(inventory_df.drop(columns=["percentage"]) if "percentage" in inventory_df.columns else inventory_df)
+                st.dataframe(
+                    inventory_df.drop(columns=["percentage"]) if "percentage" in inventory_df.columns else inventory_df)
             with col2:
                 if not inventory_df.empty:
                     fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="A1庫存分佈")
@@ -214,33 +220,33 @@ def full_product_page(df):
         else:
             st.warning("沒有符合條件的資料")
 
-    elif section_selection == "生產淡旺季":
-        # Section 2: 生產淡旺季
+    if section_selection == "生產淡旺季":
         st.subheader("生產淡旺季")
         sorted_customers = sorted(df["客戶"].unique())
         selected_customer = st.sidebar.selectbox("選擇客戶", sorted_customers)
         filtered_df = df[df["客戶"] == selected_customer]
 
         if start_date and end_date:
-            filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
+            filtered_df = filtered_df[
+                (filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
         else:
             filtered_df = df.copy()
 
         filtered_df["Year"] = filtered_df["客戶需求日期"].dt.year
-        filtered_df["Month"] = filtered_df["客戶需求日期"].dt.month.astype(int)  # Extract month and convert to integer
+        filtered_df["Month"] = filtered_df["客戶需求日期"].dt.month.astype(int)
 
         # Aggregate by Year and Month
         seasonality_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
 
-        # Ensure the dataset contains all months (fill missing months with 0)
+        # Ensure the dataset contains all months
         all_years = seasonality_df["Year"].unique()
-        full_months = pd.DataFrame({"Month": list(range(1, 13))})  # Ensure 1-12 always appear
+        full_months = pd.DataFrame({"Month": list(range(1, 13))})
 
         full_data = []
         for year in all_years:
             df_year = seasonality_df[seasonality_df["Year"] == year]
             df_full = full_months.merge(df_year, on="Month", how="left").fillna({"原始訂單數": 0})
-            df_full["Year"] = year  # Add Year column
+            df_full["Year"] = year
             full_data.append(df_full)
 
         seasonality_df = pd.concat(full_data)
@@ -260,66 +266,40 @@ def full_product_page(df):
         else:
             st.warning("沒有符合條件的資料")
 
-    # if section_selection == "Top 10 生產淡旺季":
-    #     # Section 3: 生產淡旺季Top 10
-    #     st.subheader("生產淡旺季Top 10")
-
-    #     if start_date and end_date:
-    #         filtered_df = df[(df["交貨日"] >= start_date) & (df["交貨日"] <= end_date)]
-    #     else:
-    #         filtered_df = df.copy()
-
-    #     filtered_df["Year"] = filtered_df["交貨日"].dt.year
-    #     filtered_df["Month"] = filtered_df["交貨日"].dt.strftime("%m")  # Extract month as string
-    #     filtered_df["Month"] = filtered_df["Month"].astype(int)  # Convert to integer for sorting
-
-    #     seasonality_top10_df = filtered_df.groupby(["Month", "Year"], as_index=False)["原始訂單數"].sum()
-    #     seasonality_top10_df = seasonality_top10_df.sort_values(by=["Month"])
-
-    #     st.subheader(f"生產淡旺季Top 10 明細 ({start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')})")
-    #     st.dataframe(seasonality_top10_df, hide_index=True)
-
-    #     if not seasonality_top10_df.empty:
-    #         fig = px.line(seasonality_top10_df, x="Month", y="原始訂單數", color="Year",
-    #                       title="生產淡旺季Top 10 趨勢圖", markers=True, line_shape='linear')
-    #         fig.update_xaxes(type='category', tickmode='array', tickvals=list(range(1, 13)),
-    #                          ticktext=[f"{i}月" for i in range(1, 13)])
-    #         st.plotly_chart(fig)
-    #     else:
-    #         st.warning("沒有符合條件的資料")
     elif section_selection == "Top10 庫存":
         # Section 3: Top10 庫存
         st.subheader("Top10 庫存")
 
         if start_date and end_date:
-             filtered_df = df[(df["客戶需求日期"] >= start_date) & (df["客戶需求日期"] <= end_date)]
+            filtered_df = df[(df["客戶需求日期"] >= start_date) & (df["客戶需求日期"] <= end_date)]
         else:
             filtered_df = df.copy()
 
-    # Get the last delivery date in the filtered data
-    if not filtered_df.empty:
-        last_date = filtered_df["客戶需求日期"].max()
-        # Filter to only include rows with the last delivery date
-        last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
-        
-        # Group by item name and get the inventory for the last date
-        inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
-        inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
-        
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(last_date)
-            st.subheader(f"Top10 庫存 (最後交貨日: {last_date_str})")
-            st.dataframe(inventory_df, hide_index=True)
-        with col2:
-            if not inventory_df.empty:
-                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="Top10 庫存分佈")
-                st.plotly_chart(fig)
-            else:
-                st.warning("沒有符合條件的資料")
-    else:
-        st.warning("沒有符合條件的資料")
+        # Get the last delivery date in the filtered data
+        if not filtered_df.empty:
+            # Fix: Use 交貨日 consistently instead of mixing with 客戶需求日期
+            last_date = filtered_df["交貨日"].max()
+            # Filter to only include rows with the last delivery date
+            last_date_df = filtered_df[filtered_df["交貨日"] == last_date]
 
+            # Group by item name and get the inventory for the last date
+            inventory_df = last_date_df.groupby("項目名稱", as_index=False)["A1庫存"].sum()
+            inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
+
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                last_date_str = last_date.strftime('%Y-%m-%d') if isinstance(last_date, pd.Timestamp) else str(
+                    last_date)
+                st.subheader(f"Top10 庫存 (最後交貨日: {last_date_str})")
+                st.dataframe(inventory_df, hide_index=True)
+            with col2:
+                if not inventory_df.empty:
+                    fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="Top10 庫存分佈")
+                    st.plotly_chart(fig)
+                else:
+                    st.warning("沒有符合條件的資料")
+        else:
+            st.warning("沒有符合條件的資料")
 
 # Upload the data
 st.sidebar.header("Upload Your Data")
@@ -347,4 +327,3 @@ if uploaded_file is not None:
         st.error(f"An error occurred: {e}")
 else:
     st.write("Please upload an Excel file to begin.")
-
