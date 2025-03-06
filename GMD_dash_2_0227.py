@@ -29,7 +29,17 @@ def product_page(df):
     date_range = st.sidebar.date_input("Select 客戶需求日期", [])
 
     # Select 項目名稱
-    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", df["項目名稱"].str[:3].unique())
+        # Convert to string first
+    df["項目名稱"] = df["項目名稱"].astype(str)
+
+    # Get unique prefixes, exclude "nan"
+    item_prefixes = [prefix for prefix in df["項目名稱"].str[:3].unique() if prefix != "nan"]
+
+    # Sort the prefixes
+    sorted_item_prefixes = sorted(item_prefixes)
+
+    # Select 項目名稱
+    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", sorted_item_prefixes)
     
 
     # Select Chart Type
