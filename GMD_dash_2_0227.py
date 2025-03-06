@@ -288,14 +288,14 @@ def full_product_page(df):
     #     else:
     #         st.warning("沒有符合條件的資料")
 
-    elif section_selection == "Top10 庫存":
+elif section_selection == "Top10 庫存":
         # Section 3: Top10 庫存
-        st.subheader("Top10 庫存")
+    st.subheader("Top10 庫存")
 
-        if start_date and end_date:
-            filtered_df = df[(df["客戶需求日期"] >= start_date) & (df["客戶需求日期"] <= end_date)]
-        else:
-            filtered_df = df.copy()
+    if start_date and end_date:
+         filtered_df = df[(df["客戶需求日期"] >= start_date) & (df["客戶需求日期"] <= end_date)]
+    else:
+        filtered_df = df.copy()
 
     # Get the last delivery date in the filtered data
     if not filtered_df.empty:
