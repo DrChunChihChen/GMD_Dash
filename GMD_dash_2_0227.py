@@ -29,7 +29,8 @@ def product_page(df):
     date_range = st.sidebar.date_input("Select 客戶需求日期", [])
 
     # Select 項目名稱
-    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", df["項目名稱"].str[:3].unique())
+    sorted_item_prefixes = sorted(df["項目名稱"].str[:3].unique())
+    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", sorted_item_prefixes)
 
     # Select Chart Type
     chart_type = st.sidebar.selectbox("Select Chart Type", ["Line", "Bar", "Both"])
