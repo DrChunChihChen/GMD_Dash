@@ -29,7 +29,7 @@ def product_page(df):
     date_range = st.sidebar.date_input("Select 客戶需求日期", [])
 
     # Select 項目名稱
-    sorted_item_prefixes = sorted(df["項目名稱"].str[:3].unique())
+    sorted_item_prefixes = sorted(df[df["項目名稱"].notna()]["項目名稱"].str[:3].unique())
     item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", sorted_item_prefixes)
 
     # Select Chart Type
