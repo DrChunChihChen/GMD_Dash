@@ -293,14 +293,14 @@ def full_product_page(df):
         st.subheader("Top10 庫存")
 
         # Get the latest available date in the dataset
-        latest_date = df["交貨日"].max()
+        latest_date = df["客戶需求日期"].max()
 
         if pd.notna(latest_date):  # Ensure latest_date is valid
             # Filter the dataframe for only the latest date
-            latest_df = df[df["交貨日"] == latest_date]
+            latest_df = df[df["客戶需求日期"] == latest_date]
 
             # Keep only the latest day's A1庫存 for each 項目名稱
-            inventory_df = latest_df.sort_values(by="交貨日", ascending=False).drop_duplicates(subset=["項目名稱"],
+            inventory_df = latest_df.sort_values(by="客戶需求日期", ascending=False).drop_duplicates(subset=["項目名稱"],
                                                                                                keep="first")
 
             # Sort and get the Top 10 based on A1庫存
