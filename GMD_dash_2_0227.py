@@ -30,13 +30,11 @@ def product_page(df):
 
     # Select 項目名稱
     # Ensure all values are strings before extracting prefixes
-    df["項目名稱_str"] = df["項目名稱"].astype(str)
-# Replace "nan" strings that come from NaN values
-    df.loc[df["項目名稱_str"] == "nan", "項目名稱_str"] = ""
-# Get prefixes from the string column and exclude empty string
-    prefixes = [prefix for prefix in df["項目名稱_str"].str[:3].unique() if prefix]
-    sorted_item_prefixes = sorted(prefixes)
-    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", sorted_item_prefixes)
+    date_range = st.sidebar.date_input("Select 客戶需求日期", [])
+
+    # Select 項目名稱
+    item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", df["項目名稱"].str[:3].unique())
+    
 
     # Select Chart Type
     chart_type = st.sidebar.selectbox("Select Chart Type", ["Line", "Bar", "Both"])
