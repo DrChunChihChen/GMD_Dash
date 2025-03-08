@@ -227,7 +227,7 @@ def full_product_page(df):
             last_date = filtered_df["客戶需求日期"].max()
             last_date_str = last_date.strftime('%Y-%m-%d')
 
-        col1, col2 = st.columns([3, 1])  # Change ratio from 1:1 to 2:1 to give more space to the table
+        col1, col2 = st.columns([2, 1])  # Change ratio from 1:1 to 2:1 to give more space to the table
         with col1:
             st.subheader(f"A1庫存明細 (最後交貨日: {last_date_str})")
     # Display table with the formatted date column and hide index
@@ -240,10 +240,10 @@ def full_product_page(df):
                 hide_index=True,
                 use_container_width=True,  # Use the full width of col1
                 column_config={
-                    "項目名稱": st.column_config.TextColumn("項目名稱", width="medium"),
-                    "項目說明": st.column_config.TextColumn("項目說明", width="large"),
+                    "項目名稱": st.column_config.TextColumn("項目名稱", width="small"),
+                    "項目說明": st.column_config.TextColumn("項目說明", width="small"),
                     "公模": st.column_config.TextColumn("公模", width="small"),
-                    "客戶需求日期": st.column_config.TextColumn("客戶需求日期", width="medium"),
+                    "客戶需求日期": st.column_config.TextColumn("客戶需求日期", width="small"),
                     "A1庫存": st.column_config.NumberColumn("A1庫存", width="small")
             }
         )
