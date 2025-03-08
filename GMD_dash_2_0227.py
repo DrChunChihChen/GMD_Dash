@@ -251,8 +251,8 @@ def full_product_page(df):
             if not inventory_df.empty:
                 fig = px.pie(inventory_df, names="項目名稱", values="A1庫存", title="A1庫存分佈")
                 st.plotly_chart(fig, use_container_width=True)  # Use the full width of col2
-                else:
-                    st.warning("沒有符合條件的資料")
+                        else:
+                            st.warning("沒有符合條件的資料")
         else:
             st.warning("沒有符合條件的資料")
 
