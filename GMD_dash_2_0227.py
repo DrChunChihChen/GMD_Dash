@@ -321,16 +321,17 @@ def full_product_page(df):
             # Sort and get the Top 10 based on A1庫存
             inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
 
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.subheader(f" ({latest_date.strftime('%Y-%m-%d')})")
-                st.dataframe(inventory_df[["項目名稱", "項目說明", "公模", "A1庫存"]], hide_index=True)
-            with col2:
-                if not inventory_df.empty:
-                    fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
-                    st.plotly_chart(fig)
-                else:
-                    st.warning("沒有符合條件的資料")
+            #col1, col2 = st.columns([1, 1])
+            #with col1:
+            st.subheader(f" ({latest_date.strftime('%Y-%m-%d')})")
+            st.dataframe(inventory_df[["項目名稱", "項目說明", "公模", "A1庫存"]], hide_index=True)
+            #with col2:
+            st.markdown("---")
+            if not inventory_df.empty:
+                fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
+                st.plotly_chart(fig)
+            else:
+                st.warning("沒有符合條件的資料")
         else:
             st.warning("無法獲取最新日期的資料")
 
