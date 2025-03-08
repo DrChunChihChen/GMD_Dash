@@ -311,8 +311,7 @@ def full_product_page(df):
             col1, col2 = st.columns([1, 1])
             with col1:
                 st.subheader(f" ({latest_date.strftime('%Y-%m-%d')})")
-                st.dataframe(inventory_df[["項目名稱", "A1庫存"]], hide_index=True)
-
+                st.dataframe(inventory_df[["項目名稱", "項目說明", "公模", "A1庫存"]], hide_index=True)
             with col2:
                 if not inventory_df.empty:
                     fig = px.pie(inventory_df, names="項目名稱", values="A1庫存")
