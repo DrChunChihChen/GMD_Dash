@@ -122,7 +122,12 @@ def dealer_page(df):
     else:
         # If a top 10 dealer is selected, use it directly
         final_customer_name = selected_dealer_option
-
+    if "輪徑" in df.columns:
+        filtered_wheel_sizes = df["輪徑"].dropna().unique()
+        sorted_wheel_sizes = sorted(filtered_wheel_sizes.astype(str))
+        wheel_size = st.sidebar.selectbox("Select 輪徑", sorted_wheel_sizes)
+    else:
+        wheel_size = None
     # Select Chart Type
     chart_type = st.sidebar.selectbox("Select Chart Type", ["Line", "Bar", "Both"])
 
@@ -133,13 +138,7 @@ def dealer_page(df):
         filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) &
                                  (filtered_df["客戶需求日期"] <= end_date)]
     filtered_df = filtered_df[filtered_df["客戶名稱"] == final_customer_name]
-    if "輪徑" in df.columns:
-        filtered_wheel_sizes = df[df["項目名稱"].str.startswith(item_name)]["輪徑"].dropna().unique()
-        sorted_wheel_sizes = sorted(filtered_wheel_sizes.astype(str))
-        wheel_size = st.sidebar.selectbox("Select 輪徑", sorted_wheel_sizes)
-    else:
-        wheel_size = None
-        # Apply 輪徑 filter if selected
+
     if wheel_size:
         filtered_df = filtered_df[filtered_df["輪徑"].astype(str) == wheel_size]
 
