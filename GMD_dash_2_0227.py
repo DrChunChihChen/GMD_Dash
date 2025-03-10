@@ -307,19 +307,15 @@ def full_product_page(df):
         # Section 3: Top10 庫存
         st.subheader("Top10 庫存")
 
-        # Get the latest available date in the dataset
-        latest_date = df["客戶需求日期"].max()
+        # Group by 項目名稱 and get the latest 客戶需求日期 for each item
+         latest_df = df.loc[df.groupby("項目名稱")["客戶需求日期"].idxmax()]
 
-        if pd.notna(latest_date):  # Ensure latest_date is valid
-            # Filter the dataframe for only the latest date
-            latest_df = df[df["客戶需求日期"] == latest_date]
+         if not latest_df.empty:  # Ensure latest_df is not empty
+        # Sort and get the Top 10 based on A1庫存
+            inventory_df = latest_df.sort_values(by="A1庫存", ascending=False).head(10)
 
-            # Keep only the latest day's A1庫存 for each 項目名稱
-            inventory_df = latest_df.sort_values(by="客戶需求日期", ascending=False).drop_duplicates(subset=["項目名稱"],
-                                                                                               keep="first")
-
-            # Sort and get the Top 10 based on A1庫存
-            inventory_df = inventory_df.sort_values(by="A1庫存", ascending=False).head(10)
+        # Get the latest available date for reference (not for filtering)
+            latest_date = latest_df["客戶需求日期"].max()
 
             #col1, col2 = st.columns([1, 1])
             #with col1:
