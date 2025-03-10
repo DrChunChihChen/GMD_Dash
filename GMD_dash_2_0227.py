@@ -310,7 +310,7 @@ def full_product_page(df):
         # Group by 項目名稱 and get the latest 客戶需求日期 for each item
         latest_df = df.loc[df.groupby("項目名稱")["客戶需求日期"].idxmax()]
 
-         if not latest_df.empty:  # Ensure latest_df is not empty
+        if not latest_df.empty:  # Ensure latest_df is not empty
         # Sort and get the Top 10 based on A1庫存
             inventory_df = latest_df.sort_values(by="A1庫存", ascending=False).head(10)
 
