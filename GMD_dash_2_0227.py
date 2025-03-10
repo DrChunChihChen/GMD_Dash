@@ -39,7 +39,13 @@ def product_page(df):
 
     # Select 項目名稱
     item_name = st.sidebar.selectbox("Select 項目名稱 (first 3 chars as catalog)", sorted_item_prefixes)
-
+        # **NEW: Filter available 輪徑 based on selected 項目名稱**
+    if "輪徑" in df.columns:
+        filtered_wheel_sizes = df[df["項目名稱"].str.startswith(item_name)]["輪徑"].dropna().unique()
+        sorted_wheel_sizes = sorted(filtered_wheel_sizes.astype(str))
+        wheel_size = st.sidebar.selectbox("Select 輪徑", sorted_wheel_sizes)
+    else:
+        wheel_size = None
     # Select Chart Type
     chart_type = st.sidebar.selectbox("Select Chart Type", ["Line", "Bar", "Both"])
 
@@ -49,7 +55,9 @@ def product_page(df):
         start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
         filtered_df = filtered_df[(filtered_df["客戶需求日期"] >= start_date) & (filtered_df["客戶需求日期"] <= end_date)]
     filtered_df = filtered_df[filtered_df["項目名稱"].notna() & filtered_df["項目名稱"].str.startswith(item_name)]
-
+        # **Apply 輪徑 filter if selected**
+    if wheel_size:
+        filtered_df = filtered_df[filtered_df["輪徑"].astype(str) == wheel_size]
 
     # Group by Year and Month for each metric
     filtered_df['Year'] = filtered_df['客戶需求日期'].dt.year
